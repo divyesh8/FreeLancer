@@ -1,6 +1,6 @@
 import { mkdir, copyFile, readFile, writeFile } from 'node:fs/promises';
 import { projects } from '../site.config.js';
-const files = ['index.html', 'styles.css', 'app.js', 'motion.js', 'site.config.js', 'favicon.svg'];
+const files = ['index.html', 'styles.css', 'app.js', 'motion.js', 'site.config.js', 'favicon.svg', 'motion-preview.jpg'];
 const html = await readFile('index.html', 'utf8');
 const ids = new Set([...html.matchAll(/\bid="([^"]+)"/g)].map(m => m[1]));
 for (const [, anchor] of html.matchAll(/href="#([^"]+)"/g)) if (!ids.has(anchor)) throw new Error(`Broken anchor: ${anchor}`);
