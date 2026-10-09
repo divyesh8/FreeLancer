@@ -24,22 +24,33 @@ function resize() { if (!context) return; const rect = canvas.getBoundingClientR
 function render(time) {
   if (!context) return;
   context.clearRect(0, 0, width, height);
-  const t = reduced ? .7 : time * .00016;
-  eased.x += (pointer.x - eased.x) * .04; eased.y += (pointer.y - eased.y) * .04;
-  context.save(); context.translate(width * .52 + (reduced ? 0 : eased.x * 15), height * .48 + (reduced ? 0 : eased.y * 12));
-  context.rotate(-.39 + (reduced ? 0 : scroll * .00012));
-  const size = Math.min(width * .36, height * .43);
-  for (let j = 0; j < 61; j++) {
-    const phase = j / 60;
-    context.beginPath();
-    for (let i = 0; i <= 150; i++) {
-      const a = i / 150 * Math.PI * 2;
-      const r = size * (.82 + phase * .18 + .15 * Math.sin(a * 3 + t + phase * 1.9));
-      const x = Math.cos(a) * r * 1.23 + Math.sin(phase * Math.PI * 2 + a * 2 + t) * size * .32;
-      const y = Math.sin(a) * r * .61 + (phase - .5) * size * .8;
-      i === 0 ? context.moveTo(x, y) : context.lineTo(x, y);
+  const gentle = motionQuery.matches;
+  const t = reduced ? .8 : time * (gentle ? .000035 : .00014);
+  eased.x += (pointer.x - eased.x) * .035; eased.y += (pointer.y - eased.y) * .035;
+  context.save();
+  context.translate(width*.5 + (reduced || gentle ? 0 : eased.x*24), height*.49 + (reduced || gentle ? 0 : eased.y*15));
+  context.rotate(-.34 + (reduced || gentle ? 0 : scroll*.0003));
+  const size = Math.min(width*.28,height*.46);
+  const count = width < 600 ? 36 : 64;
+  // Two interlaced contour fields: creative intuition and engineering precision.
+  for(let layer=0;layer<2;layer++) {
+    for(let j=0;j<count;j++) {
+      const f=j/(count-1), phase=t+layer*Math.PI;
+      context.beginPath();
+      for(let k=0;k<=100;k++) {
+        const a=k/100*Math.PI*2;
+        const twist=Math.sin(a*2+phase)*.28;
+        const radius=size*(.65+f*.38);
+        const x=Math.cos(a)*radius*1.34 + Math.sin(a*3+phase)*size*.18;
+        const y=Math.sin(a)*radius*.57 + Math.sin(a+phase)*size*.30 + (f-.5)*size*.45;
+        const xx=x*Math.cos(twist)-y*Math.sin(twist);
+        const yy=x*Math.sin(twist)+y*Math.cos(twist);
+        if(k===0) context.moveTo(xx,yy); else context.lineTo(xx,yy);
+      }
+      context.closePath();
+      context.strokeStyle=layer===0 ? 'rgba(215,246,80,'+(.12+.6*Math.sin(f*Math.PI))+')' : 'rgba(223,228,218,'+(.06+.36*Math.sin(f*Math.PI))+')';
+      context.lineWidth=width<600?.7:.85; context.stroke();
     }
-    context.closePath(); context.strokeStyle = `rgba(213,250,53,${.27 + .55 * Math.sin(phase * Math.PI)})`; context.lineWidth = .8; context.stroke();
   }
   context.restore();
 }
@@ -84,12 +95,13 @@ function updateTimeline() {
   const rect = timeline.getBoundingClientRect();
   const progress = reduced ? 1 : Math.max(0, Math.min(1, (innerHeight * .85 - rect.top) / (rect.height + innerHeight * .25)));
   timeline.style.setProperty('--progress', progress);
+  timeline.querySelectorAll(':scope > div').forEach((el,i)=>el.classList.toggle('milestone-active',progress >= i/3));
   scrollTick = false;
 }
 window.addEventListener('scroll', () => { if (!scrollTick) { scrollTick = true; requestAnimationFrame(updateTimeline); } }, {passive:true});
 updateTimeline();
 const animationObserver = new IntersectionObserver(entries => entries.forEach(({target,isIntersecting}) => target.classList.toggle('in-view', isIntersecting)));
-document.querySelectorAll('.process-instrument,.service,.timeline').forEach(el => animationObserver.observe(el));
+document.querySelectorAll('.process-instrument,.process-machine,.service,.timeline').forEach(el => animationObserver.observe(el));
 // The four stages are selectable, with progressive emphasis and semantic pressed states.
 const stages = [...document.querySelectorAll('.process-grid article')];
 stages.forEach((stage, index) => {
@@ -102,6 +114,8 @@ stages.forEach((stage, index) => {
   button.addEventListener('click', () => {
     stages.forEach((el, i) => { el.classList.toggle('selected', i === index); el.querySelector('button').setAttribute('aria-pressed', String(i === index)); });
     document.querySelector('.process-instrument').dataset.stage = String(index);
+    document.querySelector('.process-machine').dataset.stage = String(index);
+    document.querySelector('.machine-label').textContent = ['01 / DISCOVER THE POSSIBILITY','02 / DEFINE THE SYSTEM','03 / CONNECT THE PIECES','04 / READY FOR THE WORLD'][index];
     document.querySelector('.process-instrument>span').textContent = ['AN IDEA BECOMES A SHARED DIRECTION.', 'A DIRECTION BECOMES A VISUAL LANGUAGE.', 'DESIGN AND ENGINEERING COME TOGETHER.', 'THE DETAILS MAKE THE DIFFERENCE.'][index];
   });
 });

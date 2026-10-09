@@ -1,15 +1,16 @@
-// One explicit preference shared by every page; system preference is the default.
+// Motion runs by default; explicit Pause persists. OS reduced-motion uses a gentler mode.
 const system = matchMedia('(prefers-reduced-motion: reduce)');
-let preference = 'system';
-try { preference = localStorage.getItem('form-field-motion') || 'system'; } catch {}
-export let motionReduced = preference === 'off' || (preference === 'system' && system.matches);
+let preference = 'full';
+try { preference = localStorage.getItem('form-field-motion-v2') || 'full'; } catch {}
+export let motionReduced = preference === 'off';
 const root = document.documentElement;
 const control = document.createElement('button');
 control.className = 'motion-control'; control.type = 'button';
 document.body.append(control);
 function sync() {
-  motionReduced = preference === 'off' || (preference === 'system' && system.matches);
+  motionReduced = preference === 'off';
   root.classList.toggle('reduced', motionReduced);
+  root.classList.toggle('gentle-motion', system.matches);
   root.classList.toggle('motion-full', !motionReduced);
   document.querySelectorAll('.motion-control,#motion-toggle').forEach(button => {
     button.disabled = false;
@@ -19,7 +20,7 @@ function sync() {
   });
   document.dispatchEvent(new CustomEvent('motionchange', {detail:motionReduced}));
 }
-function toggle() { preference = motionReduced ? 'full' : 'off'; try { localStorage.setItem('form-field-motion', preference); } catch {} sync(); }
+function toggle() { preference = motionReduced ? 'full' : 'off'; try { localStorage.setItem('form-field-motion-v2', preference); } catch {} sync(); }
 control.addEventListener('click', toggle);
 document.querySelector('#motion-toggle')?.addEventListener('click', toggle);
 system.addEventListener('change', sync);
@@ -77,10 +78,10 @@ function character(kind) {
 }
 const hero = document.querySelector('.hero');
 if(hero) {
-  const scout = document.createElement('button'); scout.type = 'button'; scout.className = 'hero-scout character character-spark'; scout.setAttribute('aria-label','Make Spark jump'); scout.innerHTML = character('spark'); hero.append(scout);
+
   const scene = document.createElement('section'); scene.className = 'character-scene'; scene.id = 'play';
-  scene.innerHTML = `<div class="character-stage"><div class="scene-caption"><span>INTERLUDE / THE CREATIVE CHEMISTRY</span><span>SCROLL TO BRING US TOGETHER ↓</span></div><div class="scene-orbit" aria-hidden="true"></div><h2>Serious craft.<br><em>Playful minds.</em></h2><div class="character-cast">${['spark','dot','block'].map((kind,i)=>`<button type="button" class="character character-${kind}" aria-label="Make ${kind} jump" style="--index:${i}">${character(kind)}<span>${['SPARK / THE IDEA','DOT / THE CURIOSITY','BLOCK / THE BUILDER'][i]}</span></button>`).join('')}</div><div class="scene-bottom"><p>A little curiosity.<br>A lot of possibility.</p><span>MEET THE STUDIO’S EXPERIMENTAL SIDE.<br>MOVE YOUR POINTER. TAP A CHARACTER.</span></div></div>`;
-  document.querySelector('#work').after(scene); sections.observe(scene);
+  scene.innerHTML = `<div class="character-stage"><div class="scene-caption"><span>THE STUDIO / DIFFERENT WAYS OF THINKING</span><span>SCROLL TO BRING US TOGETHER ↓</span></div><div class="scene-orbit" aria-hidden="true"></div><h2>Curiosity meets<br><em>capability.</em></h2><div class="character-cast">${['spark','dot','block'].map((kind,i)=>`<button type="button" class="character character-${kind}" aria-label="Make ${kind} jump" style="--index:${i}">${character(kind)}<span>${['SPARK / THE IDEA','DOT / THE CURIOSITY','BLOCK / THE BUILDER'][i]}</span></button>`).join('')}</div><div class="scene-bottom"><p>A little curiosity.<br>A lot of possibility.</p><span>IDEAS, EXPLORATION, AND EXECUTION.<br>MOVE YOUR POINTER. TAP A CHARACTER.</span></div></div>`;
+  document.querySelector('#about').append(scene); sections.observe(scene);
   document.querySelectorAll('.character').forEach(el=>el.addEventListener('click',()=>{
     if(motionReduced) return;
     el.classList.remove('jump'); void el.offsetWidth; el.classList.add('jump');

@@ -1,0 +1,23 @@
+import {chromium,expect} from '@playwright/test';
+import {writeFile} from 'node:fs/promises';
+const browser=await chromium.launch({channel:'msedge',headless:true});
+const context=await browser.newContext({viewport:{width:1440,height:900},reducedMotion:'no-preference'});
+const page=await context.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error' && !m.text().includes('404'))errors.push(m.text());});
+const base='http://127.0.0.1:4175';const checks=[];
+await page.goto(base);await page.waitForTimeout(1800);
+await expect(page.locator('html')).toHaveClass(/motion-full/);checks.push('Motion defaults on in a fresh browser');
+await page.screenshot({path:'qa/after-desktop.png'});
+for(const id of ['work','about','services','process','contact']){await page.locator('#'+id).scrollIntoViewIfNeeded();await page.waitForTimeout(1300);await page.screenshot({path:`qa/after-${id}.png`});}
+await page.locator('.stage-select').nth(2).click();await expect(page.locator('.process-machine')).toHaveAttribute('data-stage','2');checks.push('Process control transforms diagram');
+await page.locator('.service summary').nth(1).click();await expect(page.locator('.service').nth(1)).toHaveAttribute('open','');checks.push('Service disclosure');
+await page.locator('.character-dot').scrollIntoViewIfNeeded();await page.waitForTimeout(200);let a=await page.locator('.character-dot .character-body').evaluate(el=>getComputedStyle(el).transform);await page.waitForTimeout(350);let b=await page.locator('.character-dot .character-body').evaluate(el=>getComputedStyle(el).transform);if(a===b)throw Error('Character animation not moving');await page.locator('.character-dot').click();await expect(page.locator('.character-dot')).toHaveClass(/jump/);checks.push('Character continuous motion and jump');
+await page.mouse.move(500,300);await expect(page.locator('html')).toHaveClass(/custom-pointer/);checks.push('Desktop custom cursor activates');
+await page.locator('.motion-control').click();await expect(page.locator('html')).toHaveClass(/reduced/);await page.locator('.motion-control').click();checks.push('Pause and resume');
+await page.locator('nav a[href="#about"]').click();await expect(page).toHaveURL(/#about/);await page.waitForTimeout(900);if(Math.abs(await page.locator('#about').evaluate(el=>el.getBoundingClientRect().top)-36)>5)throw Error('Incorrect section destination');checks.push('Section curtain and destination');
+await page.locator('.project').first().click();await expect(page).toHaveURL(/work\/index.html/);await expect(page.locator('h1')).toContainText('Index');await page.getByText('Next: Offset').click();await expect(page).toHaveURL(/offset.html/);checks.push('Cross-page transition and next project');
+await page.goto(base+'/#contact');await page.locator('#contact-form button[type=submit]').click();await expect(page.locator('#name')).toBeFocused();await page.locator('#name').fill('Test Person');await page.locator('#email').fill('test@example.com');await page.locator('#project-type').selectOption('Website');await page.locator('#description').fill('Testing a detailed local project brief with validation.');await page.locator('#contact-form button[type=submit]').click();await expect(page.locator('#form-status')).toContainText('has not been sent');const downloadEvent=page.waitForEvent('download');await page.getByRole('button',{name:'Download your brief ↓',exact:true}).click();await (await downloadEvent).saveAs('qa/test-brief.txt');checks.push('Validation, honest unconfigured state, download');
+for(const width of [768,390]){await page.setViewportSize({width,height:900});await page.goto(base);await page.waitForTimeout(1700);await page.screenshot({path:`qa/after-${width}.png`});const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth);if(overflow)throw Error('Overflow '+width);if(width===390){await page.locator('.menu-toggle').click();await page.locator('nav a[href="#services"]').click();await expect(page).toHaveURL(/#services/);await expect(page.locator('.menu-toggle')).toHaveAttribute('aria-expanded','false');}checks.push('Responsive width '+width);}
+await page.emulateMedia({reducedMotion:'reduce'});await expect(page.locator('html')).toHaveClass(/gentle-motion/);await expect(page.locator('.character-body').first()).toHaveCSS('animation-name','none');checks.push('Reduced-motion gentle fallback');
+await page.goto(base+'/missing');await expect(page.locator('h1')).toContainText('Lost');checks.push('Custom 404');
+if(errors.length)throw Error(errors.join('\n'));
+checks.push('No JavaScript/console errors');await writeFile('qa/results.json',JSON.stringify(checks,null,2));console.log(checks.join('\n'));await browser.close();

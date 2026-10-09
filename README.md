@@ -1,77 +1,53 @@
-# Form / Field
+# FORM / FIELD
 
-A complete static studio website, adapted from the existing HTML/CSS/JavaScript project. No framework migration or runtime dependencies. Form / Field is a proposed identity; the portfolio is explicitly original demonstration work, not client work.
+Static creative-studio website, redesigned in place. HTML, CSS, native JavaScript modules, CSS/SVG characters and a custom canvas field. No runtime framework or animation-library dependency. Vercel configuration is preserved.
 
-## Run
+## Run and deploy
 
-Requires Node.js 20+ and npm. No installation is needed.
+Requires Node.js 20+. Run `npm run dev` and visit http://127.0.0.1:4173. If the port is in use, PowerShell: `$env:PORT='4175'; npm run dev`.
 
-```powershell
-npm run check
-npm run build
-npm run dev
-```
+- `npm run check`: JavaScript syntax checks.
+- `npm run build`: regenerate portfolio/case studies/404 and copy static output into `dist`.
+- `npm install` then `npm run test:browser`: headless Edge interaction suite. Start the site on port 4175 first. Microsoft Edge must be installed. Test reports/screenshots are written to ignored `qa/`.
+- Vercel: build command `npm run build`, output directory `dist`, framework preset Other. Deploy the updated repository through its existing Vercel Git integration or run `npx vercel --prod` after authenticating/linking the correct project. No deployment was performed during this redesign.
+- Other static hosts: publish the contents of `dist/`, with `404.html` as the unknown-route response. No SPA fallback.
 
-Open http://127.0.0.1:4173. If that port is occupied:
+## Audit and redesign
 
-```powershell
-$env:PORT = '4174'
-npm run dev
-```
+The old opening separated the message from its graphic; equal-sized project cards flattened the work; most sections repeated the same entrance; the characters felt detached from the studio story. The redesign creates one interlaced field behind monumental type, a light editorial portfolio with asymmetric proportions, a drawing story line, characters within About, and a process diagram that assembles as stages are selected. The form and genuine content are retained.
 
-The development command generates the case-study pages before serving. Rebuild after editing project records, and reload the browser after changes. `node scripts/serve.mjs --dist` previews the production output.
-
-## Deploy
-
-1. Replace the content and configure contact delivery described below.
-2. Run `npm run check` and `npm run build`.
-3. Upload the **contents of dist/** to a static host, or connect this repository with build command `npm run build` and publish directory `dist`.
-4. Configure the host to serve `404.html` with HTTP 404 for unknown URLs. Do not enable a single-page-app fallback.
-5. Use HTTPS, configure your domain, and test the form against the real provider. No hosting credentials or public deployment are included in this local repository task.
+Two refinement passes tightened hero word spacing/process typography, then checked motion timing, cursor behavior, default preferences, mobile layouts and reduced motion. The deployed site was captured at desktop/tablet/mobile sizes. The external references opened in the headless browser but their screenshots remained on loading screens, so their complete live motion could not be compared reliably.
 
 ## Main files
 
-- `index.html`: semantic homepage, editable team/story placeholders, services, process and contact form.
-- `styles.css`: visual identity, responsive layouts and CSS/SVG motion.
-- `app.js`: canvas ribbon, cursor, motion preference, navigation, scroll timeline, process controls and form.
-- `site.config.js`: project narratives, public email, social links and delivery endpoint.
-- `scripts/build.mjs`: generates three standalone case studies, custom 404 and production output.
-- `scripts/serve.mjs`: local development/production-preview server, supports the PORT environment variable.
-- `work/*.html` and `404.html`: generated pages; edit the build template or configuration instead.
+- `index.html`: homepage sections and editable studio information. The marked portfolio region is generated.
+- `redesign.css`: new composition, editorial layouts, stage diagrams, mobile styles and gentle-motion rules.
+- `styles.css`: original shared artwork and interaction foundations.
+- `app.js`: continuous interlaced canvas field, pointer/cursor, service/process controls, scroll timeline and contact handling.
+- `motion.js`: default motion preference, page shutters, masked type, scroll choreography and interactive SVG cast.
+- `site.config.js`: project narratives, optional thumbnail/images, services, technologies, links and contact configuration.
+- `project-art.js`: shared original CSS artwork for demonstration projects.
+- `scripts/build.mjs`: portfolio, standalone case studies and production output.
+- `scripts/qa.mjs`: repeatable browser interaction and responsive checks.
 
-## Content before launch
+Add a project record to `site.config.js`; the build generates its card and detail page. Set `thumbnail` to an optional site-relative asset path, `images` to `{src, alt}` records (use root-relative `/assets/...` paths for detail images), `url` to its verified live URL, and `isConcept` appropriately. Put assets in `assets/`; the build copies them. With no thumbnail, the original code-generated composition is used. Update `social-preview.png` and social metadata if the domain/design changes.
 
-Replace the proposed studio name in the HTML, build template, metadata and favicon. Replace bracketed facts in `index.html`, including team names/roles, founding year and milestones. Confirm proposed services and working process. Update the project records in `site.config.js` and their homepage artwork/copy together. Do not remove demonstration labels until you supply genuine projects. Add approved professional links to `site.socials` and an actual address to `site.email`. No team photos, testimonials, client logos or results are fabricated.
+## Motion
 
-## Contact delivery
+New visitors get motion automatically. The persistent Pause control stops it; the explicit choice persists under `form-field-motion-v2`. Previous experimental preference keys are not reused. OS reduced-motion requests select a gentle presentation: no large travel, character loops, cursor override, project tilt, or fast canvas movement. No OS settings are modified.
 
-No endpoint or email was provided. The default form validates required fields, email, length and whitespace. It then clearly reports **not sent**, and offers a local text-file download. No personal information is stored in localStorage or sent anywhere in this mode.
+Four distinct sequences: interlaced hero fields with pointer/scroll response; perspective/mask project previews with project-specific hover artwork; scroll-drawn origin timeline; assembling process diagram. Characters blink, wave, float, track the pointer, and jump on click or keyboard activation. Loops pause offscreen/when hidden. Native scrolling, links, semantic buttons, form labels, focus states, and explicit Pause remain available.
 
-Set `site.contactEndpoint` to an HTTPS form service or server endpoint accepting a JSON POST with `name`, `email`, `projectType`, `budget`, `description`, and `website` (honeypot). The endpoint must permit your origin via CORS, validate every field server-side, reject filled honeypots, enforce rate limits/body-size limits, and return 2xx only after accepting delivery. Return non-2xx for failure. Keep provider keys on the server; never put secrets in site.config.js. No secret environment variables are required by the static frontend.
+## Honest content and contact blocker
 
-The configured mode includes disabled/pending submit state, 15-second timeout, success feedback and error feedback that preserves entries. These real-provider success/error paths require integration testing once an endpoint exists. Native email links are enabled only after a verified address is configured.
+FORM / FIELD remains provisional. All three projects are visibly original concepts, not client engagements. Replace bracketed names, years and milestones in `index.html`, confirm services/workflow, and supply verified projects before public business launch. No awards, clients, testimonials, or results are invented.
 
-## Motion and accessibility
+There are no delivery credentials or verified email/social addresses in the repository. Until configured, form validation offers a downloadable brief and explicitly says it has **not been sent**. No submitted personal information is sent or persisted in this mode.
 
-Original continuous 2D canvas ribbon; staggered type and artwork entrances; project mask reveals; SVG service line drawing; scroll-linked timeline; flowing process signal; magnetic CTA and contextual cursor. Native scrolling is preserved. Offscreen canvas rendering is skipped. Fine-pointer devices receive the custom core/ring only while supported and active. Native cursors return over form controls, on pointer exit, or when reduced motion is enabled. Reduced motion also disables nonessential CSS/SVG motion. The Motion control saves a local preference and respects the system setting.
+Set public `site.email`, `site.socials` and HTTPS `site.contactEndpoint` in `site.config.js`. The endpoint must accept JSON fields `name`, `email`, `projectType`, `budget`, `description`, `website` (honeypot); permit your domain via CORS; validate lengths/email server-side; reject filled honeypots; apply rate/body-size limits; and return 2xx only after accepting delivery. Keep provider keys server-side. The client has timeout, pending, success and error feedback and preserves entries on failure. Real delivery needs an integration test after configuration.
 
-Navigation, service disclosures, process controls, case studies and form use native links/buttons/inputs, focus styling, labels, skip links and live status announcements. Without JavaScript, content, projects and navigation remain accessible; enhanced form delivery needs JavaScript.
+## Checks actually executed
 
-## Verification performed
+`npm run check` and `npm run build` passed. Headless Microsoft Edge verified fresh-session default motion, process diagram state, service disclosure, changing character transforms and jump response, desktop custom cursor activation, pause/resume, curtain destination/focus, case-study navigation, required form validation, unconfigured delivery feedback, brief download, mobile menu, 768px/390px widths without document overflow, reduced-motion character suppression, and custom 404. No JavaScript errors or unexpected console errors were observed. Captures include 1440px desktop, 768px tablet and 390px mobile. A final link/asset verification covers all generated pages.
 
-- `npm run check`: passed JavaScript syntax checks. This project has no TypeScript or configured lint task.
-- `npm run build`: passed; generated all pages and verified homepage anchor targets.
-- Browser inspected at 1440×900, 768×1024 and 390×844; no horizontal document overflow observed.
-- Verified mobile menu open/close via navigation, service disclosure, all three case-study navigation paths and contact CTA.
-- Verified required-field rejection and valid brief's honest unconfigured-delivery state.
-- Captured browser error/warning logs were empty on inspected pages.
-- Browser system reduced motion was enabled: static fallback and disabled motion control verified. Live animation/custom-cursor feel could not be visually verified under this environment setting; test with reduced motion off before launch.
-- Real delivery and public deployment remain unconfigured.
-
-## Cinematic motion update
-
-`motion.js` now supplies shared navigation shutters on the homepage and case studies, large masked heading entrances, project image perspective reveals, hero scroll parallax, and a sticky SVG character scene. Spark, Dot, and Block float, blink, wave, follow the pointer with their eyes, and jump on click/keyboard activation. Character loops pause offscreen and when the tab is hidden.
-
-The persistent bottom-right control now allows an explicit full-motion choice even when the OS requests reduced motion. System settings remain the default until the visitor makes that choice. Pause motion restores the static accessible experience. The preference is shared across project pages via `form-field-motion`; no OS setting is changed.
-
-Validation for this update: syntax/build passed; browser verified full-motion opt-in, navigation to a case-study page, character jump class, pause removing animation, and mobile layout without horizontal document overflow. No browser error/warning logs were observed.
+Real contact delivery and public deployment remain unconfigured/unperformed. No TypeScript or lint task applies to this plain-JavaScript project.

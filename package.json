@@ -6,6 +6,10 @@
   "scripts": {
     "dev": "node scripts/build.mjs && node scripts/serve.mjs",
     "build": "node scripts/build.mjs",
-    "check": "node --check app.js && node --check site.config.js && node --check scripts/serve.mjs && node --check scripts/build.mjs && node --check motion.js"
+    "check": "node --check app.js && node --check site.config.js && node --check scripts/serve.mjs && node --check scripts/build.mjs && node --check motion.js && node --check project-art.js",
+    "test:browser": "node scripts/qa.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.0"
   }
 }

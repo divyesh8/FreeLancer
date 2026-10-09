@@ -1,0 +1,6 @@
+// Original CSS demonstration compositions, shared by portfolio and case studies.
+export const artwork = {
+  "index": "<div class=\"project-art art-index\"><span class=\"mock-label\">AN INDEPENDENT PERSPECTIVE</span><span class=\"index-word\">index<span>®</span></span><div class=\"index-sculpture\"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><span class=\"mock-bottom\">NEW WAYS OF SEEING. <span>VOLUME 001</span></span><span class=\"project-open\">↗</span></div>",
+  "offset": "<div class=\"project-art art-offset\"><span class=\"mock-label\">SOUND, WITHOUT BOUNDARIES.</span><div class=\"record\"><div class=\"record-label\">off<br>set<span>STEREO / 33 RPM</span></div></div><span class=\"offset-word\">offset®</span><span class=\"project-open\">↗</span></div>",
+  "common-ground": "<div class=\"project-art art-common\"><div class=\"common-copy\"><span class=\"mock-label\">ROOM FOR A NEW PERSPECTIVE.</span><span class=\"common-word\">Common<br><em>ground.</em></span><span class=\"mock-label\">SPACES. PEOPLE. POSSIBILITIES.</span></div><div class=\"architectural\"><div class=\"arch arch-one\"></div><div class=\"arch arch-two\"></div><div class=\"arch arch-three\"></div></div><span class=\"project-open\">↗</span></div>"
+};
